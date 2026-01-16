@@ -10,6 +10,7 @@ function PdfsPage() {
   const [items, setItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [query, setQuery] = useState('')
   const [selectedPdf, setSelectedPdf] = useState(null)
   const [numPages, setNumPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(1)
@@ -70,6 +71,14 @@ function PdfsPage() {
     [items, selectedPdf]
   )
 
+  const filteredItems = useMemo(() => {
+    const normalized = query.trim().toLowerCase()
+    if (!normalized) return items
+    return items.filter((item) =>
+      item.title.toLowerCase().includes(normalized)
+    )
+  }, [items, query])
+
   const openViewer = (url) => {
     setSelectedPdf(url)
     setPageNumber(1)
@@ -107,9 +116,20 @@ function PdfsPage() {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-blue-100">
-        Lista de PDFs disponibles
-      </h2>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <h2 className="text-lg font-semibold text-blue-100">
+          Lista de PDFs disponibles
+        </h2>
+        <div className="w-full md:max-w-xs">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Buscar por título..."
+            className="w-full rounded-lg border border-blue-500/30 bg-slate-950/60 px-3 py-2 text-sm text-blue-50 placeholder:text-blue-200/50 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+          />
+        </div>
+      </div>
       <div className="mt-6">
         {isLoading ? (
           <p className="text-sm text-blue-200/70">Cargando PDFs...</p>
@@ -119,17 +139,19 @@ function PdfsPage() {
             {error}
           </p>
         ) : null}
-        {!isLoading && !error && items.length === 0 ? (
+        {!isLoading && !error && filteredItems.length === 0 ? (
           <p className="text-sm text-blue-200/70">
-            Aún no hay PDFs subidos.
+            {query
+              ? 'No hay resultados para esta búsqueda.'
+              : 'Aún no hay PDFs subidos.'}
           </p>
         ) : null}
-        {!isLoading && !error && items.length > 0 ? (
+        {!isLoading && !error && filteredItems.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2">
-            {items.map((item) => (
+            {filteredItems.map((item) => (
               <article
                 key={item.url}
-                className="rounded-lg border border-blue-500/20 bg-slate-950/60 p-4 transition hover:border-blue-400/60 hover:bg-slate-900/90"
+                className="flex h-full flex-col rounded-lg border border-blue-500/20 bg-slate-950/60 p-4 transition hover:border-blue-400/60 hover:bg-slate-900/90"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -154,7 +176,7 @@ function PdfsPage() {
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-4 flex justify-end">
+                <div className="mt-auto flex justify-end pt-4">
                   <button
                     type="button"
                     onClick={() => openViewer(item.url)}

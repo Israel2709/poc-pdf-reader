@@ -1,12 +1,17 @@
 import { useRef, useState } from 'react'
+import { pdfjs } from 'react-pdf'
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../firebase'
+
+pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker
 
 const dropBase =
   'flex min-h-[140px] cursor-pointer items-center justify-center rounded-lg border border-dashed px-4 text-center text-sm transition'
 
 function UploadPdfPage() {
   const [title, setTitle] = useState('')
+  const [isTitleEdited, setIsTitleEdited] = useState(false)
   const [description, setDescription] = useState('')
   const [file, setFile] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -16,6 +21,21 @@ function UploadPdfPage() {
   const [error, setError] = useState('')
   const [downloadUrl, setDownloadUrl] = useState('')
   const fileInputRef = useRef(null)
+  const titleInputRef = useRef(null)
+
+  const extractPdfTitle = async (nextFile) => {
+    try {
+      const buffer = await nextFile.arrayBuffer()
+      const loadingTask = pdfjs.getDocument({ data: buffer })
+      const pdf = await loadingTask.promise
+      const metadata = await pdf.getMetadata()
+      const infoTitle = metadata?.info?.Title?.trim()
+      const metaTitle = metadata?.metadata?.get?.('dc:title')?.trim()
+      return infoTitle || metaTitle || ''
+    } catch {
+      return ''
+    }
+  }
 
   const validateFile = (nextFile) => {
     if (!nextFile) {
@@ -30,20 +50,42 @@ function UploadPdfPage() {
     return ''
   }
 
-  const handleFileSelect = (event) => {
+  const handleFileSelect = async (event) => {
     const nextFile = event.target.files?.[0] || null
     const validationError = validateFile(nextFile)
     setError(validationError)
     setFile(validationError ? null : nextFile)
+    if (!validationError && nextFile && (!title.trim() || !isTitleEdited)) {
+      const extractedTitle = await extractPdfTitle(nextFile)
+      if (extractedTitle) {
+        setTitle(extractedTitle)
+      } else {
+        setTitle(nextFile.name.replace(/\.[^/.]+$/, ''))
+        if (titleInputRef.current) {
+          titleInputRef.current.focus()
+        }
+      }
+    }
   }
 
-  const handleDrop = (event) => {
+  const handleDrop = async (event) => {
     event.preventDefault()
     setIsDragging(false)
     const nextFile = event.dataTransfer.files?.[0] || null
     const validationError = validateFile(nextFile)
     setError(validationError)
     setFile(validationError ? null : nextFile)
+    if (!validationError && nextFile && (!title.trim() || !isTitleEdited)) {
+      const extractedTitle = await extractPdfTitle(nextFile)
+      if (extractedTitle) {
+        setTitle(extractedTitle)
+      } else {
+        setTitle(nextFile.name.replace(/\.[^/.]+$/, ''))
+        if (titleInputRef.current) {
+          titleInputRef.current.focus()
+        }
+      }
+    }
   }
 
   const handleSubmit = (event) => {
@@ -101,6 +143,7 @@ function UploadPdfPage() {
         setStatus('PDF subido correctamente.')
         setDownloadUrl(url)
         setTitle('')
+        setIsTitleEdited(false)
         setDescription('')
         setFile(null)
         setProgress(0)
@@ -111,6 +154,17 @@ function UploadPdfPage() {
     )
   }
 
+  const handleClearFile = () => {
+    setFile(null)
+    setError('')
+    if (!isTitleEdited) {
+      setTitle('')
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   return (
     <section className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-6">
       <h2 className="text-xl font-semibold text-purple-100">Subir PDF</h2>
@@ -118,23 +172,6 @@ function UploadPdfPage() {
         Completa la información del PDF antes de subirlo.
       </p>
       <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <label
-            htmlFor="pdf-title"
-            className="text-sm font-medium text-purple-100"
-          >
-            Título del PDF
-          </label>
-          <input
-            id="pdf-title"
-            name="title"
-            type="text"
-            placeholder="Ej. Manual de usuario"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            className="w-full rounded-lg border border-purple-500/30 bg-slate-950/50 px-4 py-2.5 text-sm text-purple-50 placeholder:text-purple-200/50 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
-          />
-        </div>
         <div className="space-y-2">
           <label
             htmlFor="pdf-file"
@@ -178,6 +215,38 @@ function UploadPdfPage() {
             onChange={handleFileSelect}
             ref={fileInputRef}
             className="hidden"
+          />
+          {file ? (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleClearFile}
+                className="rounded-lg border border-purple-400/40 bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-100 transition hover:bg-purple-500/20"
+              >
+                Quitar archivo
+              </button>
+            </div>
+          ) : null}
+        </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="pdf-title"
+            className="text-sm font-medium text-purple-100"
+          >
+            Título del PDF
+          </label>
+          <input
+            id="pdf-title"
+            name="title"
+            type="text"
+            placeholder="Ej. Manual de usuario"
+            value={title}
+            ref={titleInputRef}
+            onChange={(event) => {
+              setTitle(event.target.value)
+              setIsTitleEdited(true)
+            }}
+            className="w-full rounded-lg border border-purple-500/30 bg-slate-950/50 px-4 py-2.5 text-sm text-purple-50 placeholder:text-purple-200/50 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
           />
         </div>
         <div className="space-y-2">
