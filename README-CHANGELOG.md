@@ -9,3 +9,7 @@
 - Subida a Firebase Storage con metadatos (título y descripción).
 - Listado de PDFs desde Storage con cards responsivas.
 - Visor interno en modal con navegación y pantalla completa.
+- Autocompletado de título desde metadata o nombre del archivo.
+- Filtro en listado por título con búsqueda en tiempo real.
+- Botón para limpiar archivo seleccionado en la subida.
+- Rewrite para rutas SPA en Vercel.
