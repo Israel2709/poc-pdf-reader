@@ -13,3 +13,4 @@
 - Filtro en listado por título con búsqueda en tiempo real.
 - Botón para limpiar archivo seleccionado en la subida.
 - Rewrite para rutas SPA en Vercel.
+- Ajustes de layout y scroll del visor PDF en mobile.

@@ -17,6 +17,8 @@ function PdfsPage() {
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const viewerRef = useRef(null)
+  const pageContainerRef = useRef(null)
+  const [pageWidth, setPageWidth] = useState(0)
 
   useEffect(() => {
     let isActive = true
@@ -114,6 +116,18 @@ function PdfsPage() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!pageContainerRef.current) return
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        setPageWidth(Math.floor(entry.contentRect.width))
+      }
+    })
+    observer.observe(pageContainerRef.current)
+    return () => observer.disconnect()
+  }, [isViewerOpen, isFullscreen])
+
   return (
     <section>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -192,21 +206,21 @@ function PdfsPage() {
       </div>
       {isViewerOpen ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-6"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden bg-slate-950/80 p-4 sm:p-6"
           onClick={closeViewer}
         >
           <div
             ref={viewerRef}
-            className={`relative w-full overflow-hidden border border-blue-500/20 bg-slate-900 ${
+            className={`relative flex w-full flex-col overflow-hidden border border-blue-500/20 bg-slate-900 ${
               isFullscreen
                 ? 'h-screen max-w-none rounded-none'
-                : 'max-h-[90vh] max-w-4xl rounded-lg'
+                : 'h-[calc(100vh-2rem)] max-w-4xl rounded-lg sm:h-[calc(100vh-3rem)]'
             }`}
             onClick={(event) => event.stopPropagation()}
             onContextMenu={(event) => event.preventDefault()}
           >
-            <div className="flex items-center justify-between border-b border-blue-500/20 px-4 py-3">
-              <div>
+            <div className="flex flex-col gap-3 border-b border-blue-500/20 px-4 py-3 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-1">
                 <p className="text-sm font-semibold text-blue-100">
                   {selectedItem?.title || 'PDF'}
                 </p>
@@ -216,7 +230,7 @@ function PdfsPage() {
                   </p>
                 ) : null}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={toggleFullscreen}
@@ -233,35 +247,36 @@ function PdfsPage() {
                 </button>
               </div>
             </div>
-            <div
-              className={`overflow-auto bg-slate-950 px-4 py-6 ${
-                isFullscreen ? 'h-[calc(100vh-120px)]' : 'max-h-[70vh]'
-              }`}
-            >
-              {selectedPdf ? (
-                <Document
-                  file={selectedPdf}
-                  onLoadSuccess={(doc) => {
-                    setNumPages(doc.numPages)
-                    setPageNumber(1)
-                  }}
-                  onLoadError={() =>
-                    setError('No se pudo cargar el PDF seleccionado.')
-                  }
-                  loading={
-                    <p className="text-sm text-blue-200/70">Cargando PDF...</p>
-                  }
-                >
-                  <Page
-                    pageNumber={pageNumber}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    className="flex justify-center"
-                  />
-                </Document>
-              ) : null}
-            </div>
-            <div className="flex items-center justify-between border-t border-blue-500/20 px-4 py-3 text-xs text-blue-200/70">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div
+                ref={pageContainerRef}
+                className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-950 px-4 py-6"
+              >
+                {selectedPdf ? (
+                  <Document
+                    file={selectedPdf}
+                    onLoadSuccess={(doc) => {
+                      setNumPages(doc.numPages)
+                      setPageNumber(1)
+                    }}
+                    onLoadError={() =>
+                      setError('No se pudo cargar el PDF seleccionado.')
+                    }
+                    loading={
+                      <p className="text-sm text-blue-200/70">Cargando PDF...</p>
+                    }
+                  >
+                    <Page
+                      pageNumber={pageNumber}
+                      width={pageWidth || undefined}
+                      renderAnnotationLayer={false}
+                      renderTextLayer={false}
+                      className="flex justify-center"
+                    />
+                  </Document>
+                ) : null}
+              </div>
+              <div className="flex items-center justify-between border-t border-blue-500/20 px-4 py-3 text-xs text-blue-200/70">
               <span>
                 Página {pageNumber} de {numPages || 1}
               </span>
@@ -285,6 +300,7 @@ function PdfsPage() {
                   Siguiente
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>
