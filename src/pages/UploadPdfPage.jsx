@@ -166,16 +166,16 @@ function UploadPdfPage() {
   }
 
   return (
-    <section className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-6">
-      <h2 className="text-xl font-semibold text-purple-100">Subir PDF</h2>
-      <p className="mt-2 text-sm text-purple-200/80">
+    <section className="rounded-lg border border-[#0094aa]/20 bg-white p-6 shadow-sm dark:border-[#0094aa]/40 dark:bg-slate-900">
+      <h2 className="text-xl font-semibold text-[#5a2766] dark:text-[#d7b3e2]">Subir PDF</h2>
+      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
         Completa la información del PDF antes de subirlo.
       </p>
       <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-2">
           <label
             htmlFor="pdf-file"
-            className="text-sm font-medium text-purple-100"
+            className="text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             Archivo PDF
           </label>
@@ -183,8 +183,8 @@ function UploadPdfPage() {
             htmlFor="pdf-file"
             className={`${dropBase} ${
               isDragging
-                ? 'border-purple-300 bg-purple-500/20 text-purple-50'
-                : 'border-purple-400/40 bg-purple-500/10 text-purple-100 hover:bg-purple-500/20'
+                ? 'border-[#0094aa] bg-[#0094aa]/10 text-[#0094aa]'
+                : 'border-[#0094aa]/40 bg-[#0094aa]/5 text-slate-700 hover:bg-[#0094aa]/10 dark:text-slate-200'
             }`}
             onDragEnter={(event) => {
               event.preventDefault()
@@ -202,7 +202,7 @@ function UploadPdfPage() {
           >
             <div>
               <p className="font-medium">Arrastra y suelta tu PDF aquí</p>
-              <p className="mt-1 text-xs text-purple-200/70">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {file ? file.name : 'o haz clic para seleccionar un archivo'}
               </p>
             </div>
@@ -221,7 +221,7 @@ function UploadPdfPage() {
               <button
                 type="button"
                 onClick={handleClearFile}
-                className="rounded-lg border border-purple-400/40 bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-100 transition hover:bg-purple-500/20"
+                className="rounded-lg border border-[#5a2766]/30 bg-[#5a2766]/10 px-3 py-1 text-xs font-semibold text-[#5a2766] transition hover:bg-[#5a2766]/20 dark:border-[#5a2766]/40 dark:text-[#d7b3e2]"
               >
                 Quitar archivo
               </button>
@@ -231,7 +231,7 @@ function UploadPdfPage() {
         <div className="space-y-2">
           <label
             htmlFor="pdf-title"
-            className="text-sm font-medium text-purple-100"
+            className="text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             Título del PDF
           </label>
@@ -246,13 +246,13 @@ function UploadPdfPage() {
               setTitle(event.target.value)
               setIsTitleEdited(true)
             }}
-            className="w-full rounded-lg border border-purple-500/30 bg-slate-950/50 px-4 py-2.5 text-sm text-purple-50 placeholder:text-purple-200/50 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+            className="w-full rounded-lg border border-[#0094aa]/30 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#0094aa] focus:outline-none focus:ring-2 focus:ring-[#0094aa]/30 dark:border-[#0094aa]/50 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
           />
         </div>
         <div className="space-y-2">
           <label
             htmlFor="pdf-description"
-            className="text-sm font-medium text-purple-100"
+            className="text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             Descripción del PDF
           </label>
@@ -263,7 +263,7 @@ function UploadPdfPage() {
             placeholder="Resumen o notas sobre el contenido del PDF"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            className="w-full rounded-lg border border-purple-500/30 bg-slate-950/50 px-4 py-2.5 text-sm text-purple-50 placeholder:text-purple-200/50 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+            className="w-full rounded-lg border border-[#0094aa]/30 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#0094aa] focus:outline-none focus:ring-2 focus:ring-[#0094aa]/30 dark:border-[#0094aa]/50 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
           />
         </div>
         {error ? (
@@ -272,12 +272,12 @@ function UploadPdfPage() {
           </p>
         ) : null}
         {status ? (
-          <div className="space-y-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-100">
+          <div className="space-y-2 rounded-lg border border-[#0094aa]/30 bg-[#0094aa]/10 px-4 py-3 text-sm text-[#0094aa] dark:border-[#0094aa]/40 dark:text-[#7ed4e1]">
             <p>{status}</p>
             {isUploading ? (
-              <div className="h-2 w-full overflow-hidden rounded-full bg-blue-900/60">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[#0094aa]/20">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-[#0094aa] to-[#5a2766] transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -287,7 +287,7 @@ function UploadPdfPage() {
                 href={downloadUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs font-semibold text-blue-200 underline underline-offset-4"
+                className="text-xs font-semibold text-[#0094aa] underline underline-offset-4 dark:text-[#7ed4e1]"
               >
                 Ver PDF subido
               </a>
@@ -297,7 +297,7 @@ function UploadPdfPage() {
         <button
           type="submit"
           disabled={isUploading}
-          className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:from-blue-400 hover:to-purple-400 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#0094aa] to-[#5a2766] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#0094aa]/25 transition hover:from-[#00a8c2] hover:to-[#6b2c7a] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isUploading ? 'Subiendo...' : 'Subir PDF'}
         </button>

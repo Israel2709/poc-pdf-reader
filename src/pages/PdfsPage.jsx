@@ -131,7 +131,7 @@ function PdfsPage() {
   return (
     <section>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-lg font-semibold text-blue-100">
+        <h2 className="text-lg font-semibold text-[#0094aa] dark:text-[#7ed4e1]">
           Lista de PDFs disponibles
         </h2>
         <div className="w-full md:max-w-xs">
@@ -140,13 +140,13 @@ function PdfsPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por título..."
-            className="w-full rounded-lg border border-blue-500/30 bg-slate-950/60 px-3 py-2 text-sm text-blue-50 placeholder:text-blue-200/50 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            className="w-full rounded-lg border border-[#0094aa]/30 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#0094aa] focus:outline-none focus:ring-2 focus:ring-[#0094aa]/30 dark:border-[#0094aa]/50 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400"
           />
         </div>
       </div>
       <div className="mt-6">
         {isLoading ? (
-          <p className="text-sm text-blue-200/70">Cargando PDFs...</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">Cargando PDFs...</p>
         ) : null}
         {error ? (
           <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-200">
@@ -154,7 +154,7 @@ function PdfsPage() {
           </p>
         ) : null}
         {!isLoading && !error && filteredItems.length === 0 ? (
-          <p className="text-sm text-blue-200/70">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {query
               ? 'No hay resultados para esta búsqueda.'
               : 'Aún no hay PDFs subidos.'}
@@ -165,24 +165,24 @@ function PdfsPage() {
             {filteredItems.map((item) => (
               <article
                 key={item.url}
-                className="flex h-full flex-col rounded-lg border border-blue-500/20 bg-slate-950/60 p-4 transition hover:border-blue-400/60 hover:bg-slate-900/90"
+                className="flex h-full flex-col rounded-lg border border-[#0094aa]/20 bg-white p-4 shadow-sm transition hover:border-[#0094aa]/60 hover:bg-[#f4fbfd] dark:border-[#0094aa]/40 dark:bg-slate-900 dark:hover:bg-slate-800"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-semibold text-blue-50">
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                       {item.title}
                     </h3>
                     {item.description ? (
-                      <p className="mt-1 text-xs text-blue-200/70">
+                      <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                         {item.description}
                       </p>
                     ) : null}
                   </div>
-                  <span className="rounded-lg border border-blue-500/30 bg-blue-500/10 px-2 py-1 text-[11px] font-semibold text-blue-100">
+                  <span className="rounded-lg border border-[#0094aa]/30 bg-[#0094aa]/10 px-2 py-1 text-[11px] font-semibold text-[#0094aa] dark:border-[#0094aa]/40 dark:text-[#7ed4e1]">
                     PDF
                   </span>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-blue-200/70">
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>{Math.round(item.size / 1024)} KB</span>
                   {item.updatedAt ? (
                     <span>
@@ -194,7 +194,7 @@ function PdfsPage() {
                   <button
                     type="button"
                     onClick={() => openViewer(item.url)}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:from-blue-400 hover:to-purple-400"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-[#0094aa] to-[#5a2766] px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-[#0094aa]/20 transition hover:from-[#00a8c2] hover:to-[#6b2c7a]"
                   >
                     Ver PDF
                   </button>
@@ -206,12 +206,12 @@ function PdfsPage() {
       </div>
       {isViewerOpen ? (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden bg-slate-950/80 p-4 sm:p-6"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden bg-slate-900/70 p-4 dark:bg-black/70 sm:p-6"
           onClick={closeViewer}
         >
           <div
             ref={viewerRef}
-            className={`relative flex w-full flex-col overflow-hidden border border-blue-500/20 bg-slate-900 ${
+            className={`relative flex w-full flex-col overflow-hidden border border-[#0094aa]/30 bg-white dark:border-[#0094aa]/40 dark:bg-slate-900 ${
               isFullscreen
                 ? 'h-screen max-w-none rounded-none'
                 : 'h-[calc(100vh-2rem)] max-w-4xl rounded-lg sm:h-[calc(100vh-3rem)]'
@@ -219,13 +219,13 @@ function PdfsPage() {
             onClick={(event) => event.stopPropagation()}
             onContextMenu={(event) => event.preventDefault()}
           >
-            <div className="flex flex-col gap-3 border-b border-blue-500/20 px-4 py-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-3 border-b border-[#0094aa]/20 px-4 py-3 md:flex-row md:items-center md:justify-between dark:border-[#0094aa]/30">
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-blue-100">
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                   {selectedItem?.title || 'PDF'}
                 </p>
                 {selectedItem?.description ? (
-                  <p className="text-xs text-blue-200/70">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     {selectedItem.description}
                   </p>
                 ) : null}
@@ -234,14 +234,14 @@ function PdfsPage() {
                 <button
                   type="button"
                   onClick={toggleFullscreen}
-                  className="rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-100 transition hover:bg-blue-500/20"
+                  className="rounded-lg border border-[#0094aa]/30 bg-[#0094aa]/10 px-3 py-1.5 text-xs font-semibold text-[#0094aa] transition hover:bg-[#0094aa]/20 dark:border-[#0094aa]/40 dark:text-[#7ed4e1]"
                 >
                   {isFullscreen ? 'Salir pantalla completa' : 'Pantalla completa'}
                 </button>
                 <button
                   type="button"
                   onClick={closeViewer}
-                  className="rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-100 transition hover:bg-blue-500/20"
+                  className="rounded-lg border border-[#5a2766]/30 bg-[#5a2766]/10 px-3 py-1.5 text-xs font-semibold text-[#5a2766] transition hover:bg-[#5a2766]/20 dark:border-[#5a2766]/40 dark:text-[#d7b3e2]"
                 >
                   Cerrar
                 </button>
@@ -250,7 +250,7 @@ function PdfsPage() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div
                 ref={pageContainerRef}
-                className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-950 px-4 py-6"
+                className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 px-4 py-6 dark:bg-slate-950"
               >
                 {selectedPdf ? (
                   <Document
@@ -263,7 +263,9 @@ function PdfsPage() {
                       setError('No se pudo cargar el PDF seleccionado.')
                     }
                     loading={
-                      <p className="text-sm text-blue-200/70">Cargando PDF...</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">
+                        Cargando PDF...
+                      </p>
                     }
                   >
                     <Page
@@ -276,7 +278,7 @@ function PdfsPage() {
                   </Document>
                 ) : null}
               </div>
-              <div className="flex items-center justify-between border-t border-blue-500/20 px-4 py-3 text-xs text-blue-200/70">
+              <div className="flex items-center justify-between border-t border-[#0094aa]/20 px-4 py-3 text-xs text-slate-600 dark:border-[#0094aa]/30 dark:text-slate-300">
               <span>
                 Página {pageNumber} de {numPages || 1}
               </span>
@@ -285,7 +287,7 @@ function PdfsPage() {
                   type="button"
                   disabled={pageNumber <= 1}
                   onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
-                  className="rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 font-semibold text-blue-100 transition hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-lg border border-[#0094aa]/30 bg-[#0094aa]/10 px-3 py-1.5 font-semibold text-[#0094aa] transition hover:bg-[#0094aa]/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#0094aa]/40 dark:text-[#7ed4e1]"
                 >
                   Anterior
                 </button>
@@ -295,7 +297,7 @@ function PdfsPage() {
                   onClick={() =>
                     setPageNumber((prev) => Math.min(prev + 1, numPages))
                   }
-                  className="rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 font-semibold text-blue-100 transition hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-lg border border-[#0094aa]/30 bg-[#0094aa]/10 px-3 py-1.5 font-semibold text-[#0094aa] transition hover:bg-[#0094aa]/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#0094aa]/40 dark:text-[#7ed4e1]"
                 >
                   Siguiente
                 </button>
