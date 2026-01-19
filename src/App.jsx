@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import logo from './assets/VSM-Horizontal-Blanco copia.PNG'
+import logo from './assets/venturessoft-logo.png'
 import PdfsPage from './pages/PdfsPage.jsx'
 import UploadPdfPage from './pages/UploadPdfPage.jsx'
 
