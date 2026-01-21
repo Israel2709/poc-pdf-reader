@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import { getDownloadURL, getMetadata, listAll, ref } from 'firebase/storage'
-import { storage } from '../firebase'
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker
 
@@ -20,53 +18,51 @@ function PdfsPage() {
   const pageContainerRef = useRef(null)
   const [pageWidth, setPageWidth] = useState(0)
 
-  useEffect(() => {
-    let isActive = true
-
-    const loadPdfs = async () => {
-      try {
-        const folderRef = ref(storage, 'pdfs')
-        const result = await listAll(folderRef)
-        const mapped = await Promise.all(
-          result.items.map(async (itemRef) => {
-            const [url, metadata] = await Promise.all([
-              getDownloadURL(itemRef),
-              getMetadata(itemRef),
-            ])
-            const custom = metadata.customMetadata || {}
-            return {
-              name: metadata.name,
-              size: metadata.size,
-              updatedAt: metadata.updated,
-              title: custom.title || metadata.name,
-              description: custom.description || '',
-              url,
-            }
-          })
-        )
-        if (isActive) {
-          setItems(mapped)
-        }
-      } catch (err) {
-        if (isActive) {
-          setError(
-            err?.message ||
-              'No se pudieron cargar los PDFs. Intenta más tarde.'
-          )
-        }
-      } finally {
-        if (isActive) {
-          setIsLoading(false)
-        }
+  const fetchPdfs = useCallback(async () => {
+    try {
+      console.debug('[pdfs] fetching list')
+      const response = await fetch('/api/pdfs')
+      if (!response.ok) {
+        throw new Error('No se pudieron cargar los PDFs.')
       }
-    }
-
-    loadPdfs()
-
-    return () => {
-      isActive = false
+      const data = await response.json()
+      console.debug('[pdfs] received', data.length)
+      setItems(data)
+      setError('')
+    } catch (err) {
+      console.warn('[pdfs] fetch error', err)
+      setError(
+        err?.message || 'No se pudieron cargar los PDFs. Intenta más tarde.'
+      )
+    } finally {
+      setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    fetchPdfs()
+  }, [fetchPdfs])
+
+  useEffect(() => {
+    let source
+    const pollId = setInterval(fetchPdfs, 10000)
+
+    try {
+      source = new EventSource('/api/pdfs/stream')
+      source.addEventListener('update', fetchPdfs)
+      source.addEventListener('ready', fetchPdfs)
+      source.onerror = () => {
+        source.close()
+      }
+    } catch {
+      // polling keeps the list updated when SSE is unavailable
+    }
+
+    return () => {
+      if (source) source.close()
+      clearInterval(pollId)
+    }
+  }, [fetchPdfs])
 
   const selectedItem = useMemo(
     () => items.find((item) => item.url === selectedPdf) || null,
@@ -132,7 +128,7 @@ function PdfsPage() {
     <section>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h2 className="text-lg font-semibold text-[#0094aa] dark:text-[#7ed4e1]">
-          Lista de PDFs disponibles
+          Lista de PDFs disponibles ({filteredItems.length})
         </h2>
         <div className="w-full md:max-w-xs">
           <input
